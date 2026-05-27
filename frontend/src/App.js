@@ -7,18 +7,39 @@ function App() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // ADD TASK
+  // NEW STATES FOR UPDATE
+  const [editId, setEditId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  // ADD OR UPDATE TASK
   const addTask = () => {
     if (task.trim() === "") return;
 
-    const newTask = {
-      id: Date.now(),
-      text: task,
-      dueDate,
-      completed: false,
-    };
+    if (isEditing) {
+      setTasks(
+        tasks.map((t) =>
+          t.id === editId
+            ? {
+                ...t,
+                text: task,
+                dueDate,
+              }
+            : t
+        )
+      );
 
-    setTasks([...tasks, newTask]);
+      setIsEditing(false);
+      setEditId(null);
+    } else {
+      const newTask = {
+        id: Date.now(),
+        text: task,
+        dueDate,
+        completed: false,
+      };
+
+      setTasks([...tasks, newTask]);
+    }
 
     setTask("");
     setDueDate("");
@@ -41,6 +62,14 @@ function App() {
           : task
       )
     );
+  };
+
+  // EDIT TASK
+  const editTask = (taskItem) => {
+    setTask(taskItem.text);
+    setDueDate(taskItem.dueDate);
+    setEditId(taskItem.id);
+    setIsEditing(true);
   };
 
   // STATS
@@ -239,7 +268,7 @@ function App() {
               onClick={addTask}
               style={buttonStyle}
             >
-              Add
+              {isEditing ? "Update" : "Add"}
             </button>
           </div>
 
@@ -304,6 +333,23 @@ function App() {
                     }}
                   >
                     Done
+                  </button>
+
+                  {/* EDIT BUTTON */}
+                  <button
+                    onClick={() =>
+                      editTask(task)
+                    }
+                    style={{
+                      background: "orange",
+                      color: "white",
+                      border: "none",
+                      padding: "8px 12px",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
                   </button>
 
                   <button
